@@ -16,16 +16,29 @@ import style from './style';
 import Search from '../../components/Search/Search';
 import Tab from '../../components/Tab/Tab';
 import {updateSelectedCategoryId} from '../../redux/reducers/Categories';
+import SingleDonationItem from '../../components/SingleDonationItem/SingleDonationItem';
 
 const Home = () => {
   const user = useSelector(state => state.user);
-  const dispatch = useDispatch();
   const categories = useSelector(state => state.categories);
-
+  const donations = useSelector(state => state.donations);
+  const dispatch = useDispatch();
+  const [donationItems, setDonationItems] = useState([]);
   const [categoryPage, setCategoryPage] = useState(1);
   const [categoryList, setCategoryList] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const categoryPageSize = 4;
+
+  console.log(donationItems);
+
+  // console.log('this is our current donation state', donations);
+
+  useEffect(() => {
+    const items = donations.items.filter(value =>
+      value.categoryIds.includes(categories.selectedCategoryId),
+    );
+    setDonationItems(items);
+  }, [categories.selectedCategoryId]);
 
   useEffect(() => {
     setIsLoadingCategories(true);
@@ -67,15 +80,13 @@ const Home = () => {
         <View style={style.searchBox}>
           <Search />
         </View>
-        <View>
-          <Pressable style={style.highlightedImageContainer}>
-            <Image
-              style={style.highlightedImage}
-              source={require('../../assets/images/highlighted_image.png')}
-              resizeMode={'contain'}
-            />
-          </Pressable>
-        </View>
+        <Pressable style={style.highlightedImageContainer}>
+          <Image
+            style={style.highlightedImage}
+            source={require('../../assets/images/highlighted_image.png')}
+            resizeMode={'contain'}
+          />
+        </Pressable>
         <View style={style.categoryHeader}>
           <Header title={'Select Category'} type={2} />
         </View>
@@ -114,6 +125,27 @@ const Home = () => {
             )}
           />
         </View>
+
+        {donationItems.length > 0 && (
+          <View style={style.donationItemContainer}>
+            {donationItems.map(value => (
+              <View key={value.donationItemId} style={style.singleDonationItem}>
+                <SingleDonationItem
+                  onPress={selectedDonationId => {}}
+                  donationItemId={value.donationItemId}
+                  uri={value.image}
+                  badgeTitle={
+                    categories.categories.filter(
+                      val => val.categoryId == categories.selectedCategoryId,
+                    )[0].name
+                  }
+                  donationTitle={value.name}
+                  price={parseFloat(value.price)}
+                />
+              </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

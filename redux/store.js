@@ -5,10 +5,12 @@ import {persistReducer, persistStore} from 'redux-persist';
 import User from './reducers/User';
 import {logger} from 'redux-logger';
 import Categories from './reducers/Categories';
+import Donations from './reducers/Donations';
 
 const rootReducer = combineReducers({
   user: User,
   categories: Categories,
+  donations: Donations,
 });
 const configuration = {
   key: 'root',
@@ -20,10 +22,12 @@ const persistedReducer = persistReducer(configuration, rootReducer);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: getDefaultMiddleware => {
-    return getDefaultMiddleware({serializableCheck: false}).concat(logger);
+    return getDefaultMiddleware({serializableCheck: false});
   },
 });
 
 export default store;
 
 export const persistor = persistStore(store);
+//persistor.purge();
+// dispatch(resetDonations();
